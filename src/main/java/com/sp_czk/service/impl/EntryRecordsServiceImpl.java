@@ -1,0 +1,64 @@
+package com.sp_czk.service.impl;
+
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.sp_czk.mapper.EntryRecordsMapper;
+import com.sp_czk.pojo.EntryRecords;
+import com.sp_czk.pojo.PageBean;
+import com.sp_czk.service.EntryRecordsService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+public class EntryRecordsServiceImpl implements EntryRecordsService {
+	@Autowired
+	private EntryRecordsMapper erm;
+	@Override
+	public PageBean page(Integer page, Integer pageSize, String name, Short identity, Integer id,
+	                     LocalDateTime begin, LocalDateTime end) {
+		/*
+		传统分页查询方法
+		//获取记录总数
+		Long count = em.count();
+		//获取分页查询列表
+		Integer start = (page-1)*pageSize;
+		List<Emp> list = em.page(start,pageSize);
+		//封装PageBean对象
+		PageBean pb = new PageBean(count,list);
+		return pb;
+		 */
+		//使用PageHelper插件
+		//设置分页参数
+		PageHelper.startPage(page,pageSize);
+		//执行查询
+		List<EntryRecords> list = erm.list(name,identity,id,begin,end);
+		Page<EntryRecords> p = (Page<EntryRecords>) list;
+		//封装结果
+		PageBean pb = new PageBean(p.getTotal(),p.getResult());
+		return pb;
+	}
+
+	@Override
+	public void delete(List<Integer> ids) {
+		erm.delete(ids);
+	}
+
+	@Override
+	public void save(EntryRecords er) {
+		erm.insert(er);
+	}
+
+	@Override
+	public EntryRecords getById(Integer id) {
+		return erm.getById(id);
+	}
+
+	@Override
+	public void update(EntryRecords er) {
+		erm.update(er);
+	}
+}
